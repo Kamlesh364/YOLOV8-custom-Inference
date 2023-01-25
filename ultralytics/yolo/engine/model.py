@@ -12,8 +12,7 @@ from ultralytics.yolo.utils.torch_utils import smart_inference_mode
 # Map head to model, predictor classes
 MODEL_MAP = {
     "detect": [
-        DetectionModel, 'yolo.TYPE.detect.DetectionTrainer', 'yolo.TYPE.detect.DetectionValidator',
-        'yolo.TYPE.detect.DetectionPredictor']}
+        DetectionModel, 'yolo.TYPE.detect.DetectionPredictor'}
 
 
 class YOLO:
