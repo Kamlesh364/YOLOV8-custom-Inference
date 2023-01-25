@@ -51,13 +51,13 @@ class AutoBackend(nn.Module):
         super().__init__()
         w = str(weights[0] if isinstance(weights, list) else weights)
         nn_module = isinstance(weights, torch.nn.Module)
-        pt, jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle, triton = self._model_type(w)
+        pt, jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle, triton = True, False, False, False, False, False, False, False, False, False, False, False, False  # backend flags
         fp16 &= pt or jit or onnx or engine or nn_module  # FP16
         nhwc = coreml or saved_model or pb or tflite or edgetpu  # BHWC formats (vs torch BCWH)
         stride = 32  # default stride
         model = None  # TODO: resolves ONNX inference, verify effect on other backends
         cuda = torch.cuda.is_available() and device.type != 'cpu'  # use CUDA
-        if not (pt or triton or nn_module):
+        if not (pt or nn_module):
             w = attempt_download(w)  # download if not local
 
         # NOTE: special case: in-memory pytorch model
@@ -353,25 +353,25 @@ class AutoBackend(nn.Module):
             for _ in range(2 if self.jit else 1):  #
                 self.forward(im)  # warmup
 
-    @staticmethod
-    def _model_type(p='path/to/model.pt'):
-        """
-        This function takes a path to a model file and returns the model type
+    # @staticmethod
+    # def _model_type(p='path/to/model.pt'):
+    #     """
+    #     This function takes a path to a model file and returns the model type
 
-        Args:
-            p: path to the model file. Defaults to path/to/model.pt
-        """
-        # Return model type from model path, i.e. path='path/to/model.onnx' -> type=onnx
-        # types = [pt, jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle]
-        from ultralytics.yolo.engine.exporter import export_formats
-        sf = list(export_formats().Suffix)  # export suffixes
-        if not is_url(p, check=False) and not isinstance(p, str):
-            check_suffix(p, sf)  # checks
-        url = urlparse(p)  # if url may be Triton inference server
-        types = [s in Path(p).name for s in sf]
-        types[8] &= not types[9]  # tflite &= not edgetpu
-        triton = not any(types) and all([any(s in url.scheme for s in ["http", "grpc"]), url.netloc])
-        return types + [triton]
+    #     Args:
+    #         p: path to the model file. Defaults to path/to/model.pt
+    #     """
+    #     # Return model type from model path, i.e. path='path/to/model.onnx' -> type=onnx
+    #     # types = [pt, jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle]
+    #     # from ultralytics.yolo.engine.exporter import export_formats
+    #     sf = ["pt", "jit", "onnx", "xml", "engine", "coreml", "saved_model", "pb", "tflite", "edgetpu", "tfjs", "paddle"]
+    #     if not is_url(p, check=False) and not isinstance(p, str):
+    #         check_suffix(p, sf)  # checks
+    #     url = urlparse(p)  # if url may be Triton inference server
+    #     types = [s in Path(p).name for s in sf]
+    #     types[8] &= not types[9]  # tflite &= not edgetpu
+    #     triton = not any(types) and all([any(s in url.scheme for s in ["http", "grpc"]), url.netloc])
+    #     return types + [triton]
 
     @staticmethod
     def _load_metadata(f=Path('path/to/meta.yaml')):
