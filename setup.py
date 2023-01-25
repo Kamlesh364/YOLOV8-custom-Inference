@@ -23,7 +23,7 @@ setup(
     python_requires=">=3.7,<=3.11",
     license='GPL-3.0',
     description='Ultralytics YOLOv8 custom Inference',
-    long_description=README,
+#     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/kamlesh364/YOLOV8-custom-inferenece",
     project_urls={
