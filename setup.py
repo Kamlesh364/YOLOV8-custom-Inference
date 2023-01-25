@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 # Settings
 FILE = Path(__file__).resolve()
 PARENT = FILE.parent  # root directory
-# README = (PARENT / "README.md").read_text(encoding="utf-8")
+README = (PARENT / "README.md").read_text(encoding="utf-8")
 REQUIREMENTS = [f'{x.name}{x.specifier}' for x in pkg.parse_requirements((PARENT / 'requirements.txt').read_text())]
 PKG_REQUIREMENTS = ['sentry_sdk']  # pip-only requirements
 
@@ -23,7 +23,7 @@ setup(
     python_requires=">=3.7,<=3.11",
     license='GPL-3.0',
     description='Ultralytics YOLOv8 custom Inference',
-#     long_description=README,
+    long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/kamlesh364/YOLOV8-custom-inferenece",
     project_urls={
