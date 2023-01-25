@@ -12,13 +12,11 @@ class Results:
 
         Args:
             boxes (Boxes, optional): A Boxes object containing the detection bounding boxes.
-            masks (Masks, optional): A Masks object containing the detection masks.
             probs (torch.Tensor, optional): A tensor containing the detection class probabilities.
             orig_shape (tuple, optional): Original image size.
 
         Attributes:
             boxes (Boxes, optional): A Boxes object containing the detection bounding boxes.
-            masks (Masks, optional): A Masks object containing the detection masks.
             probs (torch.Tensor, optional): A tensor containing the detection class probabilities.
             orig_shape (tuple, optional): Original image size.
 
@@ -29,7 +27,7 @@ class Results:
         # self.masks = Masks(masks, orig_shape) if masks is not None else None  # native size or imgsz masks
         self.probs = probs.softmax(0) if probs is not None else None
         self.orig_shape = orig_shape
-        self.comp = ["boxes", "masks", "probs"]
+        self.comp = ["boxes", "probs"]
 
     def __getitem__(self, idx):
         r = Results(orig_shape=self.orig_shape)
