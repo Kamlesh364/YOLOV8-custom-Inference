@@ -32,7 +32,7 @@ import cv2
 from ultralytics.nn.autobackend import AutoBackend
 from ultralytics.yolo.cfg import get_cfg
 from ultralytics.yolo.data.dataloaders.stream_loaders import LoadPilAndNumpy
-from ultralytics.yolo.data.utils import IMAGE_FORMAT
+from ultralytics.yolo.data.utils import IMG_FORMATS
 from ultralytics.yolo.utils import DEFAULT_CFG, LOGGER, SETTINGS, ops
 from ultralytics.yolo.utils.checks import check_imgsz, check_file
 from ultralytics.yolo.utils.files import increment_path
