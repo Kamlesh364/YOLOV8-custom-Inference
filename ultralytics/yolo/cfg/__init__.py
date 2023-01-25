@@ -19,8 +19,8 @@ CLI_HELP_MSG = \
 
         yolo TASK MODE ARGS
 
-        Where   TASK (optional) is one of [detect, segment, classify]
-                MODE (required) is one of [train, val, predict, export]
+        Where   TASK (optional) is one of [detect]
+                MODE (required) is one of [predict]
                 ARGS (optional) are any number of custom 'arg=value' pairs like 'imgsz=320' that override defaults.
                     See all ARGS at https://docs.ultralytics.com/cfg or with 'yolo cfg'
 
