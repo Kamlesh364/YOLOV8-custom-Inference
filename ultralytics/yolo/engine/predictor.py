@@ -33,7 +33,7 @@ from ultralytics.nn.autobackend import AutoBackend
 from ultralytics.yolo.cfg import get_cfg
 from ultralytics.yolo.data.dataloaders.stream_loaders import LoadPilAndNumpy
 from ultralytics.yolo.utils import DEFAULT_CFG, LOGGER, SETTINGS, ops
-from ultralytics.yolo.utils.checks import check_imgsz
+from ultralytics.yolo.utils.checks import check_imgsz, check_file
 from ultralytics.yolo.utils.files import increment_path
 from ultralytics.yolo.utils.torch_utils import select_device, smart_inference_mode
 
@@ -94,17 +94,27 @@ class BasePredictor:
     def setup_source(self, source=None):
         if not self.model:
             raise Exception("setup model before setting up source!")
-
+        # source
+        source, webcam, screenshot, from_img = self.check_source(source)
+        # model
         stride, pt = self.model.stride, self.model.pt
         imgsz = check_imgsz(self.args.imgsz, stride=stride, min_dim=2)  # check image size
 
         # Dataloader
         bs = 1  # batch_size
-        self.dataset = LoadPilAndNumpy(source,
-                                       imgsz=imgsz,
-                                       stride=stride,
-                                       auto=pt,
-                                       transforms=getattr(self.model.model, 'transforms', None))
+        if from_img:
+            self.dataset = LoadPilAndNumpy(source,
+                                           imgsz=imgsz,
+                                           stride=stride,
+                                           auto=pt,
+                                           transforms=getattr(self.model.model, 'transforms', None))
+        else:
+            self.dataset = LoadImages(source,
+                                      imgsz=imgsz,
+                                      stride=stride,
+                                      auto=pt,
+                                      transforms=getattr(self.model.model, 'transforms', None),
+                                      vid_stride=self.args.vid_stride)
         self.from_img = True
         self.imgsz = imgsz
         self.bs = bs
@@ -162,3 +172,19 @@ class BasePredictor:
         self.model = AutoBackend(model, device=device, dnn=self.args.dnn, fp16=self.args.half)
         self.device = device
         self.model.eval()
+        
+    def check_source(self, source):
+        source = source if source is not None else self.args.source
+        webcam, screenshot, from_img = False, False, False
+        if isinstance(source, (str, int, Path)):  # int for local usb carame
+            source = str(source)
+            is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
+            is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
+            webcam = source.isnumeric() or source.endswith('.streams') or (is_url and not is_file)
+            screenshot = source.lower().startswith('screen')
+            if is_url and is_file:
+                source = check_file(source)  # download
+        else:
+        else:
+            from_img = True
+        return source, webcam, screenshot, from_img
