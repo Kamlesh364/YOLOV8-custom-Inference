@@ -17,9 +17,9 @@ from torch.cuda import amp
 
 from ultralytics.nn.autobackend import AutoBackend
 from ultralytics.yolo.data.augment import LetterBox
-from ultralytics.yolo.utils import LOGGER, colorstr
+from ultralytics.yolo.utils import LOGGER
 from ultralytics.yolo.utils.files import increment_path
-from ultralytics.yolo.utils.ops import Profile, make_divisible, non_max_suppression, scale_boxes, xyxy2xywh
+from ultralytics.yolo.utils.ops import Profile, make_divisible, non_max_suppression, scale_boxes
 from ultralytics.yolo.utils.torch_utils import copy_attr, smart_inference_mode
 
 

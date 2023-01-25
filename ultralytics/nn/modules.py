@@ -8,8 +8,7 @@ import warnings
 
 import torch
 import torch.nn as nn
-
-from ultralytics.yolo.utils.tal import dist2bbox, make_anchors
+from ultralytics.yolo.utils.checks import check_version
 
 
 def autopad(k, p=None, d=1):  # kernel, padding, dilation
@@ -404,13 +403,40 @@ class Detect(nn.Module):
         if self.training:
             return x
         elif self.dynamic or self.shape != shape:
-            self.anchors, self.strides = (x.transpose(0, 1) for x in make_anchors(x, self.stride, 0.5))
+            self.anchors, self.strides = (x.transpose(0, 1) for x in self.make_anchors(x, self.stride, 0.5))
             self.shape = shape
 
         box, cls = torch.cat([xi.view(shape[0], self.no, -1) for xi in x], 2).split((self.reg_max * 4, self.nc), 1)
-        dbox = dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+        dbox = self.dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
         y = torch.cat((dbox, cls.sigmoid()), 1)
         return y if self.export else (y, x)
+
+    
+    def dist2bbox(self, distance, anchor_points, xywh=True, dim=-1):
+        """Transform distance(ltrb) to box(xywh or xyxy)."""
+        lt, rb = torch.split(distance, 2, dim)
+        x1y1 = anchor_points - lt
+        x2y2 = anchor_points + rb
+        if xywh:
+            c_xy = (x1y1 + x2y2) / 2
+            wh = x2y2 - x1y1
+            return torch.cat((c_xy, wh), dim)  # xywh bbox
+        return torch.cat((x1y1, x2y2), dim)  # xyxy bbox
+
+
+    def make_anchors(self, feats, strides, grid_cell_offset=0.5):
+        """Generate anchors from features."""
+        anchor_points, stride_tensor = [], []
+        assert feats is not None
+        dtype, device = feats[0].dtype, feats[0].device
+        for i, stride in enumerate(strides):
+            _, _, h, w = feats[i].shape
+            sx = torch.arange(end=w, device=device, dtype=dtype) + grid_cell_offset  # shift x
+            sy = torch.arange(end=h, device=device, dtype=dtype) + grid_cell_offset  # shift y
+            sy, sx = torch.meshgrid(sy, sx, indexing='ij') if check_version(torch.__version__, '1.10.0') else torch.meshgrid(sy, sx)
+            anchor_points.append(torch.stack((sx, sy), -1).view(-1, 2))
+            stride_tensor.append(torch.full((h * w, 1), stride, dtype=dtype, device=device))
+        return torch.cat(anchor_points), torch.cat(stride_tensor)
 
     def bias_init(self):
         # Initialize Detect() biases, WARNING: requires stride availability

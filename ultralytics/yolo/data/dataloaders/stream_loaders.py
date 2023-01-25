@@ -9,8 +9,9 @@ import numpy as np
 from PIL import Image
 
 from ultralytics.yolo.data.augment import LetterBox
-from ultralytics.yolo.data.utils import IMG_FORMATS
 from ultralytics.yolo.utils import ROOT
+
+IMG_FORMATS = "bmp", "dng", "jpeg", "jpg", "mpo", "png", "tif", "tiff", "webp", "pfm"  # include image suffixes
 
 class LoadImages:
     # YOLOv8 image dataloader, i.e. `python detect.py --source image.jpg`
