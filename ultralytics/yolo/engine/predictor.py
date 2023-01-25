@@ -185,6 +185,5 @@ class BasePredictor:
             if is_url and is_file:
                 source = check_file(source)  # download
         else:
-        else:
             from_img = True
         return source, webcam, screenshot, from_img
