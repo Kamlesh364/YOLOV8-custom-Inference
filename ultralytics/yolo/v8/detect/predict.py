@@ -28,7 +28,7 @@ class DetectionPredictor(BasePredictor):
             shape = orig_img[i].shape if isinstance(orig_img, list) else orig_img.shape
             pred[:, :4] = ops.scale_boxes(img.shape[2:], pred[:, :4], shape).round()
             results.append(Results(boxes=pred, orig_shape=shape[:2]))
-        return results[0].boxes.cpu().numpy()
+        return results
 
 
 def predict(cfg=DEFAULT_CFG):

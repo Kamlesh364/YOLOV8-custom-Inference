@@ -165,7 +165,7 @@ class BasePredictor:
                 p, im0 = (path[i], im0s[i])
                 p = Path(p)
 
-            yield from self.results
+            yield from self.results[0].boxes.cpu().numpy()
 
     def setup_model(self, model):
         device = select_device(self.args.device)
