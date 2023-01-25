@@ -32,6 +32,7 @@ import cv2
 from ultralytics.nn.autobackend import AutoBackend
 from ultralytics.yolo.cfg import get_cfg
 from ultralytics.yolo.data.dataloaders.stream_loaders import LoadPilAndNumpy
+from ultralytics.yolo.data.utils import IMAGE_FORMAT
 from ultralytics.yolo.utils import DEFAULT_CFG, LOGGER, SETTINGS, ops
 from ultralytics.yolo.utils.checks import check_imgsz, check_file
 from ultralytics.yolo.utils.files import increment_path
@@ -96,6 +97,8 @@ class BasePredictor:
             raise Exception("setup model before setting up source!")
         # source
         source, webcam, screenshot, from_img = self.check_source(source)
+        if webcam or screenshot:
+            raise "Wrong format as source, only Image_type is acceptable."
         # model
         stride, pt = self.model.stride, self.model.pt
         imgsz = check_imgsz(self.args.imgsz, stride=stride, min_dim=2)  # check image size
@@ -178,11 +181,10 @@ class BasePredictor:
         webcam, screenshot, from_img = False, False, False
         if isinstance(source, (str, int, Path)):  # int for local usb carame
             source = str(source)
-            is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
-            is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
+            is_file = Path(source).suffix[1:] in (IMG_FORMATS)
             webcam = source.isnumeric() or source.endswith('.streams') or (is_url and not is_file)
             screenshot = source.lower().startswith('screen')
-            if is_url and is_file:
+            if is_file:
                 source = check_file(source)  # download
         else:
             from_img = True
