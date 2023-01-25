@@ -23,15 +23,9 @@ CLI_HELP_MSG = \
                 MODE (required) is one of [predict]
                 ARGS (optional) are any number of custom 'arg=value' pairs like 'imgsz=320' that override defaults.
                     See all ARGS at https://docs.ultralytics.com/cfg or with 'yolo cfg'
-
-    1. Train a detection model for 10 epochs with an initial learning_rate of 0.01
-        yolo detect train data=coco128.yaml model=yolov8n.pt epochs=10 lr0=0.01
-
-    2. Predict a YouTube video using a pretrained segmentation model at image size 320:
+                    
+    2. Predict a YouTube video using a pretrained detection model at image size 320:
         yolo segment predict model=yolov8n-seg.pt source='https://youtu.be/Zgi9g1ksQHc' imgsz=320
-
-    3. Val a pretrained detection model at batch-size 1 and image size 640:
-        yolo detect val model=yolov8n.pt data=coco128.yaml batch=1 imgsz=640
 
     4. Export a YOLOv8n classification model to ONNX format at image size 224 by 128 (no TASK required)
         yolo export model=yolov8n-cls.pt format=onnx imgsz=224,128
