@@ -106,32 +106,10 @@ class AutoBackend(nn.Module):
 
         if self.pt or self.nn_module:  # PyTorch
             y = self.model(im, augment=augment, visualize=visualize) if augment or visualize else self.model(im)
-        elif self.onnx:  # ONNX Runtime
+            
+        if self.onnx:  # ONNX Runtime
             im = im.cpu().numpy()  # torch to numpy
             y = self.session.run(self.output_names, {self.session.get_inputs()[0].name: im})
-        else:  # TensorFlow (SavedModel, GraphDef, Lite, Edge TPU)
-            im = im.cpu().numpy()
-            if self.saved_model:  # SavedModel
-                y = self.model(im, training=False) if self.keras else self.model(im)
-            elif self.pb:  # GraphDef
-                y = self.frozen_func(x=self.tf.constant(im))
-            else:  # Lite or Edge TPU
-                input = self.input_details[0]
-                int8 = input['dtype'] == np.uint8  # is TFLite quantized uint8 model
-                if int8:
-                    scale, zero_point = input['quantization']
-                    im = (im / scale + zero_point).astype(np.uint8)  # de-scale
-                self.interpreter.set_tensor(input['index'], im)
-                self.interpreter.invoke()
-                y = []
-                for output in self.output_details:
-                    x = self.interpreter.get_tensor(output['index'])
-                    if int8:
-                        scale, zero_point = output['quantization']
-                        x = (x.astype(np.float32) - zero_point) * scale  # re-scale
-                    y.append(x)
-            y = [x if isinstance(x, np.ndarray) else x.numpy() for x in y]
-            y[0][..., :4] *= [w, h, w, h]  # xywh normalized to pixels
 
         if isinstance(y, (list, tuple)):
             return self.from_numpy(y[0]) if len(y) == 1 else [self.from_numpy(x) for x in y]
@@ -160,7 +138,7 @@ class AutoBackend(nn.Module):
         Returns:
             (None): This method runs the forward pass and don't return any value
         """
-        warmup_types = self.pt, self.jit, self.onnx, self.engine, self.saved_model, self.pb, self.triton, self.nn_module
+        warmup_types = self.pt, False, self.onnx, False, False, False, False, False
         if any(warmup_types) and (self.device.type != 'cpu' or self.triton):
             im = torch.empty(*imgsz, dtype=torch.half if self.fp16 else torch.float, device=self.device)  # input
             for _ in range(2 if self.jit else 1):  #
