@@ -182,7 +182,7 @@ class BasePredictor:
         if isinstance(source, (str, int, Path)):  # int for local usb carame
             source = str(source)
             is_file = Path(source).suffix[1:] in (IMG_FORMATS)
-            webcam = source.isnumeric() or source.endswith('.streams') or (is_url and not is_file)
+            webcam = source.isnumeric() or source.endswith('.streams')
             screenshot = source.lower().startswith('screen')
             if is_file:
                 source = check_file(source)  # download
