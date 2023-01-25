@@ -152,13 +152,13 @@ def entrypoint(debug=False):
     It uses the package's default cfg and initializes it using the passed overrides.
     Then it calls the CLI function with the composed cfg
     """
-    args = ['train', 'model=yolov8n.pt', 'data=coco128.yaml', 'imgsz=32', 'epochs=1'] if debug else sys.argv[1:]
+    args = ['predict', 'model=yolov8n.pt', 'data=coco128.yaml', 'imgsz=32', 'epochs=1'] if debug else sys.argv[1:]
     if not args:  # no arguments passed
         LOGGER.info(CLI_HELP_MSG)
         return
 
-    tasks = 'detect', 'segment', 'classify'
-    modes = 'train', 'val', 'predict', 'export'
+    tasks = 'detect'
+    modes = 'predict','export'
     special = {
         'help': lambda: LOGGER.info(CLI_HELP_MSG),
         'checks': check_yolo,
@@ -215,14 +215,12 @@ def entrypoint(debug=False):
         return
 
     # Mapping from task to module
-    module = {"detect": yolo.v8.detect, "segment": yolo.v8.segment, "classify": yolo.v8.classify}.get(cfg.task)
+    module = {"detect": yolo.v8.detect}.get(cfg.task)
     if not module:
         raise SyntaxError(f"yolo task={cfg.task} is invalid. Valid tasks are: {', '.join(tasks)}\n{CLI_HELP_MSG}")
 
     # Mapping from mode to function
     func = {
-        "train": module.train,
-        "val": module.val,
         "predict": module.predict,
         "export": yolo.engine.exporter.export}.get(cfg.mode)
     if not func:
