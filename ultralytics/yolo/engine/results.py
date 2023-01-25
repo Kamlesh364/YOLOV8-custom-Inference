@@ -124,7 +124,7 @@ class Boxes:
         if boxes.ndim == 1:
             boxes = boxes[None, :]
         assert boxes.shape[-1] == 6  # xyxy, conf, cls
-        self.boxes = boxes.to("cpu").numpy()
+        self.boxes = boxes
         self.orig_shape = torch.as_tensor(orig_shape, device=boxes.device) if isinstance(boxes, torch.Tensor) \
             else np.asarray(orig_shape)
 
