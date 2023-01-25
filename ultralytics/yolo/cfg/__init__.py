@@ -27,10 +27,7 @@ CLI_HELP_MSG = \
     2. Predict a YouTube video using a pretrained detection model at image size 320:
         yolo segment predict model=yolov8n-seg.pt source='https://youtu.be/Zgi9g1ksQHc' imgsz=320
 
-    4. Export a YOLOv8n classification model to ONNX format at image size 224 by 128 (no TASK required)
-        yolo export model=yolov8n-cls.pt format=onnx imgsz=224,128
-
-    5. Run special commands:
+    3. Run special commands:
         yolo help
         yolo checks
         yolo version
