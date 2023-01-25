@@ -35,7 +35,7 @@ class AutoBackend(nn.Module):
         w = str(weights[0] if isinstance(weights, list) else weights)
         nn_module = isinstance(weights, torch.nn.Module)
         
-        pt, onnx = weights.endswith(".pt"), weights.endswith('.onnx')
+        pt, onnx = str(weights).endswith(".pt"), str(weights).endswith('.onnx')
 
         fp16 &= pt or onnx or nn_module  # FP16
         nhwc = False  # BHWC formats (vs torch BCWH)
