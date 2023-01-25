@@ -158,7 +158,7 @@ def entrypoint(debug=False):
         return
 
     tasks = 'detect'
-    modes = 'predict','export'
+    modes = 'predict'
     special = {
         'help': lambda: LOGGER.info(CLI_HELP_MSG),
         'checks': check_yolo,
@@ -221,8 +221,7 @@ def entrypoint(debug=False):
 
     # Mapping from mode to function
     func = {
-        "predict": module.predict,
-        "export": yolo.engine.exporter.export}.get(cfg.mode)
+        "predict": module.predict}.get(cfg.mode)
     if not func:
         raise SyntaxError(f"yolo mode={cfg.mode} is invalid. Valid modes are: {', '.join(modes)}\n{CLI_HELP_MSG}")
 
