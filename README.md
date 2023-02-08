@@ -14,7 +14,7 @@ all [requirements.txt](https://github.com/Kamlesh364/YOLOV8-custom-Inference/blo
 [**PyTorch>=1.7**](https://pytorch.org/get-started/locally/).
 
 ```bash
-pip install git+https://github.com/Kamlesh364/YOLOV8-custom-Inference.git
+pip install git+https://github.com/Kamlesh364/inferenceV8.git
 ```
 
 </details>
